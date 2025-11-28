@@ -1,0 +1,399 @@
+# =============================================================================
+# DRV8301 Three-Phase Gate Driver Device Driver Definition
+# =============================================================================
+# This file defines the register map and configuration for the DRV8301
+# Gate Driver IC manufactured by Texas Instruments.
+#
+# Features:
+# - 6V to 60V Operating Voltage (PVDD)
+# - Three-phase half-bridge gate driver
+# - SPI interface for configuration and status monitoring
+# - Current shunt amplifiers with configurable gain (10/20/40/80 V/V)
+# - Overcurrent protection with configurable VDS thresholds
+# - PWM mode selection (6-PWM or 3-PWM)
+#
+# Interface: SPI (CPOL=0, CPHA=1, 16-bit frames, MSB first)
+# Package: HTSSOP-56
+# =============================================================================
+
+config:
+  # Address type for all registers (4-bit addressing embedded in 16-bit frame)
+  register_address_type: u8
+
+  # Default byte order - big endian (MSB first on SPI bus)
+  default_byte_order: BE
+
+  # Default bit order - LSB0 (bit 0 is least significant)
+  default_bit_order: LSB0
+
+  # Default access patterns
+  default_register_access: RW
+  default_field_access: RW
+
+  # Enable defmt support for debugging
+  defmt_feature: "defmt"
+
+  # Name conversion for register/field names from datasheet
+  name_word_boundaries: ["Underscore", "Hyphen", "LowerUpper", "UpperDigit", "DigitUpper"]
+
+# =============================================================================
+# STATUS REGISTERS (Read-Only)
+# =============================================================================
+
+StatusRegister1:
+  # Address 0x00 - Status Register 1
+  type: register
+  address: 0x00
+  size_bits: 16
+  access: RO
+  description: |
+    Status Register 1 contains fault and warning indicators for the DRV8301.
+    All overcurrent status bits are latched until read via SPI.
+    Note: Only bits [10:0] contain valid data; bits [15:11] are part of SPI framing.
+  fields:
+    fault:
+      base: bool
+      start: 10
+      access: RO
+      description: |
+        Latched fault indicator. Logical OR of all fault conditions:
+        GVDD_UV, GVDD_OV, PVDD_UV, OTSD, and all FET overcurrent faults.
+
+    gvdd_uv:
+      base: bool
+      start: 9
+      access: RO
+      description: |
+        GVDD (gate driver supply) undervoltage fault.
+        Triggers when GVDD falls below ~8V.
+
+    pvdd_uv:
+      base: bool
+      start: 8
+      access: RO
+      description: |
+        PVDD (power supply) undervoltage fault.
+        Triggers when PVDD falls below ~5.9V.
+
+    otsd:
+      base: bool
+      start: 7
+      access: RO
+      description: |
+        Overtemperature shutdown fault.
+        Device shuts down when die temperature exceeds ~150°C.
+        Clears when temperature drops below ~130°C.
+
+    otw:
+      base: bool
+      start: 6
+      access: RO
+      description: |
+        Overtemperature warning.
+        Indicates die temperature has exceeded ~130°C warning threshold.
+        Clears when temperature drops below ~115°C.
+
+    fetha_oc:
+      base: bool
+      start: 5
+      access: RO
+      description: |
+        Half-bridge A, high-side FET overcurrent fault.
+        Latched until read.
+
+    fetla_oc:
+      base: bool
+      start: 4
+      access: RO
+      description: |
+        Half-bridge A, low-side FET overcurrent fault.
+        Latched until read.
+
+    fethb_oc:
+      base: bool
+      start: 3
+      access: RO
+      description: |
+        Half-bridge B, high-side FET overcurrent fault.
+        Latched until read.
+
+    fetlb_oc:
+      base: bool
+      start: 2
+      access: RO
+      description: |
+        Half-bridge B, low-side FET overcurrent fault.
+        Latched until read.
+
+    fethc_oc:
+      base: bool
+      start: 1
+      access: RO
+      description: |
+        Half-bridge C, high-side FET overcurrent fault.
+        Latched until read.
+
+    fetlc_oc:
+      base: bool
+      start: 0
+      access: RO
+      description: |
+        Half-bridge C, low-side FET overcurrent fault.
+        Latched until read.
+
+
+StatusRegister2:
+  # Address 0x01 - Status Register 2
+  type: register
+  address: 0x01
+  size_bits: 16
+  access: RO
+  description: |
+    Status Register 2 contains the GVDD overvoltage fault indicator
+    and the device identification code.
+    Note: Only bits [10:0] contain valid data; bits [15:11] are part of SPI framing.
+  fields:
+    gvdd_ov:
+      base: bool
+      start: 10
+      access: RO
+      description: |
+        GVDD (gate driver supply) overvoltage fault.
+        Triggers when GVDD exceeds ~16V.
+        This fault can only be cleared by a full EN_GATE reset (>20µs low).
+
+    device_id:
+      base: uint
+      start: 0
+      end: 4
+      access: RO
+      description: |
+        Device identification code.
+        Used to verify communication with a DRV8301 device.
+
+# =============================================================================
+# CONTROL REGISTERS (Read/Write)
+# =============================================================================
+
+ControlRegister1:
+  # Address 0x02 - Control Register 1
+  type: register
+  address: 0x02
+  size_bits: 16
+  access: RW
+  reset_value: 0x0000
+  description: |
+    Control Register 1 configures the gate driver behavior including
+    gate drive current, fault reset, PWM mode, and overcurrent protection settings.
+    Note: Only bits [10:0] contain valid data; bits [15:11] are part of SPI framing.
+  fields:
+    oc_adj_set:
+      base: uint
+      start: 6
+      end: 11
+      description: |
+        Overcurrent (VDS) threshold adjustment.
+        Sets the VDS trip voltage for overcurrent detection.
+        See OcAdjSet enum for voltage values.
+        Note: Values 28-31 (1.679V-2.400V) not available when PVDD = 6-8V.
+      conversion:
+        name: OcAdjSet
+        description: VDS overcurrent threshold settings (typical values)
+        Vds060mV: { value: 0, description: "VDS threshold = 0.060V" }
+        Vds068mV: { value: 1, description: "VDS threshold = 0.068V" }
+        Vds076mV: { value: 2, description: "VDS threshold = 0.076V" }
+        Vds086mV: { value: 3, description: "VDS threshold = 0.086V" }
+        Vds097mV: { value: 4, description: "VDS threshold = 0.097V" }
+        Vds109mV: { value: 5, description: "VDS threshold = 0.109V" }
+        Vds123mV: { value: 6, description: "VDS threshold = 0.123V" }
+        Vds138mV: { value: 7, description: "VDS threshold = 0.138V" }
+        Vds155mV: { value: 8, description: "VDS threshold = 0.155V" }
+        Vds175mV: { value: 9, description: "VDS threshold = 0.175V" }
+        Vds197mV: { value: 10, description: "VDS threshold = 0.197V" }
+        Vds222mV: { value: 11, description: "VDS threshold = 0.222V" }
+        Vds250mV: { value: 12, description: "VDS threshold = 0.250V" }
+        Vds282mV: { value: 13, description: "VDS threshold = 0.282V" }
+        Vds317mV: { value: 14, description: "VDS threshold = 0.317V" }
+        Vds358mV: { value: 15, description: "VDS threshold = 0.358V" }
+        Vds403mV: { value: 16, description: "VDS threshold = 0.403V" }
+        Vds454mV: { value: 17, description: "VDS threshold = 0.454V" }
+        Vds511mV: { value: 18, description: "VDS threshold = 0.511V" }
+        Vds576mV: { value: 19, description: "VDS threshold = 0.576V" }
+        Vds648mV: { value: 20, description: "VDS threshold = 0.648V" }
+        Vds730mV: { value: 21, description: "VDS threshold = 0.730V" }
+        Vds822mV: { value: 22, description: "VDS threshold = 0.822V" }
+        Vds926mV: { value: 23, description: "VDS threshold = 0.926V" }
+        Vds1043mV: { value: 24, description: "VDS threshold = 1.043V" }
+        Vds1175mV: { value: 25, description: "VDS threshold = 1.175V" }
+        Vds1324mV: { value: 26, description: "VDS threshold = 1.324V" }
+        Vds1491mV: { value: 27, description: "VDS threshold = 1.491V" }
+        Vds1679mV: { value: 28, description: "VDS threshold = 1.679V (not available at PVDD 6-8V)" }
+        Vds1892mV: { value: 29, description: "VDS threshold = 1.892V (not available at PVDD 6-8V)" }
+        Vds2131mV: { value: 30, description: "VDS threshold = 2.131V (not available at PVDD 6-8V)" }
+        Vds2400mV: { value: 31, description: "VDS threshold = 2.400V (not available at PVDD 6-8V)" }
+
+    ocp_mode:
+      base: uint
+      start: 4
+      end: 6
+      description: |
+        Overcurrent protection mode selection.
+        Determines the device behavior when an overcurrent event is detected.
+      conversion:
+        name: OcpMode
+        description: Overcurrent protection operating mode
+        CurrentLimit:
+          value: 0b00
+          description: |
+            Current limit mode. Device limits current and reports on nOCTW.
+            Half-bridge continues operating with current limiting.
+        OcLatchShutdown:
+          value: 0b01
+          description: |
+            OC latch shutdown mode. Disables half-bridge and latches fault.
+            Requires fault reset to recover.
+        ReportOnly:
+          value: 0b10
+          description: |
+            Report only mode. No protective action taken.
+            Overcurrent events reported on nOCTW pin only.
+        OcDisabled:
+          value: 0b11
+          description: |
+            Overcurrent detection disabled.
+            No OC monitoring or protection active.
+
+    pwm_mode:
+      base: bool
+      start: 3
+      description: |
+        PWM input mode selection:
+        - false (0): 6-PWM mode - INH_x and INL_x inputs are independent
+        - true (1): 3-PWM mode - Only INH_x inputs used, INL_x inputs ignored
+
+    gate_reset:
+      base: bool
+      start: 2
+      description: |
+        Gate driver fault reset.
+        Writing true (1) resets latched gate driver faults and status registers.
+        This bit auto-clears to 0 after the reset operation completes.
+        Note: Cannot clear GVDD_OV fault - requires full EN_GATE reset.
+
+    gate_current:
+      base: uint
+      start: 0
+      end: 2
+      description: |
+        Peak gate drive current setting.
+        Controls the maximum current sourced/sunk to/from the gate driver outputs.
+      conversion:
+        name: GateCurrent
+        description: Peak gate drive current settings
+        High:
+          value: 0b00
+          description: "Peak source: 1.7A, Peak sink: 2.3A"
+        Medium:
+          value: 0b01
+          description: "Peak source: 0.7A, Peak sink: 1.0A"
+        Low:
+          value: 0b10
+          description: "Peak source: 0.25A, Peak sink: 0.5A"
+        Reserved:
+          value: 0b11
+          description: "Reserved - do not use"
+
+
+ControlRegister2:
+  # Address 0x03 - Control Register 2
+  type: register
+  address: 0x03
+  size_bits: 16
+  access: RW
+  reset_value: 0x0000
+  description: |
+    Control Register 2 configures the current shunt amplifier settings
+    including gain, DC calibration mode, and overcurrent off-time control.
+    Note: Only bits [10:0] contain valid data; bits [15:11] are part of SPI framing.
+  fields:
+    # Bits 10:7 are reserved - must write 0
+    reserved:
+      base: uint
+      start: 7
+      end: 11
+      access: RO
+      description: |
+        Reserved bits. Must always be written as 0.
+
+    oc_toff:
+      base: bool
+      start: 6
+      description: |
+        Overcurrent off-time control mode:
+        - false (0): Cycle-by-cycle current limiting
+        - true (1): Off-time control mode (64µs disable period after OC event)
+
+    dc_cal_ch2:
+      base: bool
+      start: 5
+      description: |
+        DC calibration mode for shunt amplifier channel 2:
+        - false (0): Normal operation (connected to sense resistor)
+        - true (1): Calibration mode (inputs shorted, load disconnected)
+        Use calibration mode to measure amplifier offset voltage.
+
+    dc_cal_ch1:
+      base: bool
+      start: 4
+      description: |
+        DC calibration mode for shunt amplifier channel 1:
+        - false (0): Normal operation (connected to sense resistor)
+        - true (1): Calibration mode (inputs shorted, load disconnected)
+        Use calibration mode to measure amplifier offset voltage.
+
+    octw_mode:
+      base: uint
+      start: 0
+      end: 2
+      description: |
+        nOCTW pin reporting mode selection.
+        Controls what conditions are reported on the nOCTW output pin.
+      conversion:
+        name: OctwMode
+        description: nOCTW pin reporting mode
+        OtAndOc:
+          value: 0b00
+          description: "Report both overtemperature (OT) and overcurrent (OC) on nOCTW"
+        OtOnly:
+          value: 0b01
+          description: "Report overtemperature (OT) only on nOCTW"
+        OcOnly:
+          value: 0b10
+          description: "Report overcurrent (OC) only on nOCTW"
+        OcOnlyReserved:
+          value: 0b11
+          description: "Report overcurrent (OC) only (reserved value, same as 0b10)"
+
+    gain:
+      base: uint
+      start: 2
+      end: 4
+      description: |
+        Current shunt amplifier gain setting.
+        Applies to both channel 1 and channel 2 amplifiers.
+        Output equation: Vout = (Vref/2) - Gain × (SN - SP)
+      conversion:
+        name: ShuntAmplifierGain
+        description: Current shunt amplifier gain settings
+        Gain10:
+          value: 0b00
+          description: "10 V/V gain, ~3.3MHz bandwidth, 300ns settling"
+        Gain20:
+          value: 0b01
+          description: "20 V/V gain, ~1.65MHz bandwidth, 600ns settling"
+        Gain40:
+          value: 0b10
+          description: "40 V/V gain, ~825kHz bandwidth, 1.2µs settling"
+        Gain80:
+          value: 0b11
+          description: "80 V/V gain, ~412kHz bandwidth, 2.4µs settling"
