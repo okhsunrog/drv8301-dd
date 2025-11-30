@@ -88,25 +88,51 @@ where
 {
     let mut drv = Drv8301Async::new(spi);
 
-    // Read device ID
+    info!("=== High-Level API Examples ===");
+
+    // Read device ID (high-level API)
     info!("Device ID: {:#x}", drv.get_device_id().await?);
 
-    // Check for faults
+    // Check for faults (high-level API)
     let has_fault = drv.has_fault().await?;
     info!("Has fault: {}", has_fault);
 
-    // Configure overcurrent threshold
+    // Configure overcurrent threshold (high-level API)
     drv.set_oc_threshold(OcAdjSet::Vds250mV).await?;
 
-    // Set overcurrent protection mode
+    // Set overcurrent protection mode (high-level API)
     drv.set_ocp_mode(OcpMode::CurrentLimit).await?;
 
-    // Set 6-PWM mode
+    // Set 6-PWM mode (high-level API)
     drv.set_pwm_mode(false).await?;
 
-    // Set amplifier gain
+    // Set amplifier gain (high-level API)
     drv.set_shunt_amplifier_gain(ShuntAmplifierGain::Gain20)
         .await?;
+
+    info!("=== Low-Level API Examples ===");
+
+    // Read status register 1 using low-level API
+    let status1 = drv.ll.status_register_1().read_async().await?;
+    info!("Status1 - Fault: {}, GVDD_UV: {}, OTW: {}",
+          status1.fault(), status1.gvdd_uv(), status1.otw());
+
+    // Read status register 2 using low-level API
+    let status2 = drv.ll.status_register_2().read_async().await?;
+    info!("Status2 - Device ID: {:#x}, GVDD_OV: {}",
+          status2.device_id(), status2.gvdd_ov());
+
+    // Read control register 1 using low-level API
+    let ctrl1 = drv.ll.control_register_1().read_async().await?;
+    info!("Ctrl1 - PWM mode: {:?}, OC threshold: {:?}",
+          ctrl1.pwm_mode(), ctrl1.oc_adj_set());
+
+    // Modify control register 2 to enable DC calibration using low-level API
+    drv.ll.control_register_2().modify_async(|w| {
+        w.set_dc_cal_ch1(true);
+        w.set_dc_cal_ch2(true);
+    }).await?;
+    info!("DC calibration enabled via LL API");
 
     info!("DRV8301 configured!");
 
