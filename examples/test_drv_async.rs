@@ -132,9 +132,9 @@ where
     // Read control register 1 using low-level API
     let ctrl1 = drv.ll.control_register_1().read_async().await?;
     info!(
-        "Ctrl1 - PWM mode: {:?}, OC threshold: {:?}",
+        "Ctrl1 - 3-PWM mode: {}, OC threshold raw: {}",
         ctrl1.pwm_mode(),
-        ctrl1.oc_adj_set()
+        ctrl1.oc_adj_set() as u8
     );
 
     // Modify control register 2 to enable DC calibration using low-level API

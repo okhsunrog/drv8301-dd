@@ -19,19 +19,6 @@ The `drv8301-dd` driver offers:
 - **`no_std` and `no-alloc`:** Optimized for bare-metal and RTOS environments.
 - **Optional Logging:** Supports `defmt` and the `log` facade for debugging.
 
-## ⚠️ Warning! ⚠️
-
-**Caution!** The DRV8301 controls high-voltage, high-current motor driver circuits. Incorrect configuration may cause:
-- Motor damage or uncontrolled operation
-- Gate driver failure
-- Electrical damage to connected equipment
-- Safety hazards in high-power systems
-
-- **Always consult the official DRV8301 datasheet** before modifying driver settings.
-- Verify voltage and current limits for your motor and power supply.
-- Test with low power before deploying in production systems.
-- The authors are not liable for damage caused by misuse.
-
 ## Features
 
 - **Declarative Register Map:** Defined in `device.yaml`.

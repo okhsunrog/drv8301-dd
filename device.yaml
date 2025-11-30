@@ -155,7 +155,7 @@ StatusRegister2:
   fields:
     gvdd_ov:
       base: bool
-      start: 10
+      start: 7
       access: RO
       description: |
         GVDD (gate driver supply) overvoltage fault.
