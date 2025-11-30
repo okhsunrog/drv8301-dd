@@ -101,18 +101,28 @@ where
 
     // Read status register 1 using low-level API
     let status1 = drv.ll.status_register_1().read()?;
-    info!("Status1 - Fault: {}, GVDD_UV: {}, OTW: {}",
-          status1.fault(), status1.gvdd_uv(), status1.otw());
+    info!(
+        "Status1 - Fault: {}, GVDD_UV: {}, OTW: {}",
+        status1.fault(),
+        status1.gvdd_uv(),
+        status1.otw()
+    );
 
     // Read status register 2 using low-level API
     let status2 = drv.ll.status_register_2().read()?;
-    info!("Status2 - Device ID: {:#x}, GVDD_OV: {}",
-          status2.device_id(), status2.gvdd_ov());
+    info!(
+        "Status2 - Device ID: {:#x}, GVDD_OV: {}",
+        status2.device_id(),
+        status2.gvdd_ov()
+    );
 
     // Read control register 1 using low-level API
     let ctrl1 = drv.ll.control_register_1().read()?;
-    info!("Ctrl1 - PWM mode: {:?}, OC threshold: {:?}",
-          ctrl1.pwm_mode(), ctrl1.oc_adj_set());
+    info!(
+        "Ctrl1 - PWM mode: {:?}, OC threshold: {:?}",
+        ctrl1.pwm_mode(),
+        ctrl1.oc_adj_set()
+    );
 
     // Modify control register 2 to enable DC calibration using low-level API
     drv.ll.control_register_2().modify(|w| {
