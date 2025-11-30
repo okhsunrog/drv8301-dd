@@ -40,7 +40,7 @@ The `drv8301-dd` driver offers:
 
    ```toml
    [dependencies]
-   drv8301-dd = "0.1.0"
+   drv8301-dd = "0.2.0"
    # For blocking usage (Drv8301):
    embedded-hal = "1.0.0"
    # For async usage (Drv8301Async):
@@ -72,6 +72,15 @@ The `drv8301-dd` driver offers:
      // Read device status
      let device_id = drv.get_device_id()?;
      let has_fault = drv.has_fault()?;
+
+     // Get comprehensive fault status
+     let status = drv.get_fault_status()?;
+     if status.has_overcurrent() {
+         // Handle overcurrent on any phase
+     }
+     if status.phase_a_overcurrent() {
+         // Phase A specific fault
+     }
      ```
 
    - **Async:**
@@ -93,6 +102,15 @@ The `drv8301-dd` driver offers:
      // Read device status
      let device_id = drv.get_device_id().await?;
      let has_fault = drv.has_fault().await?;
+
+     // Get comprehensive fault status
+     let status = drv.get_fault_status().await?;
+     if status.has_overcurrent() {
+         // Handle overcurrent on any phase
+     }
+     if status.has_thermal() {
+         // Handle overtemperature warning or shutdown
+     }
      ```
 
 ## Low-Level API Usage

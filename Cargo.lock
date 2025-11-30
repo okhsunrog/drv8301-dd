@@ -362,7 +362,7 @@ dependencies = [
 
 [[package]]
 name = "drv8301-dd"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "bisync",
  "defmt 1.0.1",

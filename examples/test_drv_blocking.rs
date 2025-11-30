@@ -2,7 +2,7 @@
 #![no_main]
 
 use defmt::info;
-use drv8301_dd::{Drv8301, DrvError, OcAdjSet, OcpMode, ShuntAmplifierGain};
+use drv8301_dd::{Drv8301, DrvError, FaultStatus, OcAdjSet, OcpMode, ShuntAmplifierGain};
 use embedded_hal_bus::spi::ExclusiveDevice;
 use esp_hal::{
     delay::Delay,
@@ -84,6 +84,23 @@ where
     // Check for faults (high-level API)
     let has_fault = drv.has_fault()?;
     info!("Has fault: {}", has_fault);
+
+    // Get comprehensive fault status (high-level API)
+    let fault_status: FaultStatus = drv.get_fault_status()?;
+    info!(
+        "Fault status - OC: {}, Thermal: {}, Voltage: {}",
+        fault_status.has_overcurrent(),
+        fault_status.has_thermal(),
+        fault_status.has_voltage_fault()
+    );
+    if fault_status.has_overcurrent() {
+        info!(
+            "  Phase OC - A: {}, B: {}, C: {}",
+            fault_status.phase_a_overcurrent(),
+            fault_status.phase_b_overcurrent(),
+            fault_status.phase_c_overcurrent()
+        );
+    }
 
     // Configure overcurrent threshold (high-level API)
     drv.set_oc_threshold(OcAdjSet::Vds250mV)?;

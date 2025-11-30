@@ -1,5 +1,5 @@
 use super::{RegisterInterface, SpiDevice, bisync, only_async, only_sync};
-use crate::{DrvError, DrvInterface, DrvLowLevel};
+use crate::{DrvError, DrvInterface, DrvLowLevel, FaultStatus};
 use crate::{GateCurrent, OcAdjSet, OcpMode, OctwMode, ShuntAmplifierGain};
 
 #[bisync]
@@ -138,45 +138,47 @@ where
         Ok(status.device_id())
     }
 
-    /// Get full fault status including all fault flags
-    #[allow(clippy::type_complexity)]
+    /// Get complete fault status from both status registers
+    ///
+    /// Returns a [`FaultStatus`] struct containing all fault flags from the DRV8301.
+    /// This includes voltage faults, thermal conditions, and per-phase overcurrent status.
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// # use drv8301_dd::Drv8301;
+    /// # let spi = todo!();
+    /// # let mut drv = Drv8301::new(spi);
+    /// let status = drv.get_fault_status()?;
+    /// if status.has_overcurrent() {
+    ///     // Handle overcurrent condition
+    /// }
+    /// if status.phase_a_overcurrent() {
+    ///     // Phase A specific handling
+    /// }
+    /// # Ok::<(), drv8301_dd::DrvError<()>>(())
+    /// ```
     #[bisync]
-    pub async fn get_fault_status(
-        &mut self,
-    ) -> Result<(bool, bool, bool, bool, bool, bool), DrvError<SpiBusErr>> {
+    pub async fn get_fault_status(&mut self) -> Result<FaultStatus, DrvError<SpiBusErr>> {
         let mut op1 = self.ll.status_register_1();
         let status1 = read_internal(&mut op1).await?;
 
         let mut op2 = self.ll.status_register_2();
         let status2 = read_internal(&mut op2).await?;
 
-        Ok((
-            status1.fault(),
-            status1.gvdd_uv(),
-            status2.gvdd_ov(),
-            status1.pvdd_uv(),
-            status1.otsd(),
-            status1.otw(),
-        ))
-    }
-
-    /// Get overcurrent fault status for all phases
-    #[allow(clippy::type_complexity)]
-    #[bisync]
-    pub async fn get_overcurrent_status(
-        &mut self,
-    ) -> Result<(bool, bool, bool, bool, bool, bool), DrvError<SpiBusErr>> {
-        let mut op = self.ll.status_register_1();
-        let status = read_internal(&mut op).await?;
-
-        Ok((
-            status.fetha_oc(),
-            status.fetla_oc(),
-            status.fethb_oc(),
-            status.fetlb_oc(),
-            status.fethc_oc(),
-            status.fetlc_oc(),
-        ))
+        Ok(FaultStatus {
+            fault: status1.fault(),
+            gvdd_uv: status1.gvdd_uv(),
+            gvdd_ov: status2.gvdd_ov(),
+            pvdd_uv: status1.pvdd_uv(),
+            otsd: status1.otsd(),
+            otw: status1.otw(),
+            fetha_oc: status1.fetha_oc(),
+            fetla_oc: status1.fetla_oc(),
+            fethb_oc: status1.fethb_oc(),
+            fetlb_oc: status1.fetlb_oc(),
+            fethc_oc: status1.fethc_oc(),
+            fetlc_oc: status1.fetlc_oc(),
+        })
     }
 
     /// Set the overcurrent (VDS) threshold

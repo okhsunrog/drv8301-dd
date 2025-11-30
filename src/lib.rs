@@ -71,6 +71,81 @@ pub enum DrvError<SpiErr> {
     NotSupported(&'static str),
 }
 
+/// Complete fault status from both DRV8301 status registers
+///
+/// This struct provides a comprehensive view of all fault conditions
+/// reported by the DRV8301 gate driver IC.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct FaultStatus {
+    /// Master fault indicator (OR of all fault conditions)
+    pub fault: bool,
+    /// GVDD undervoltage fault (GVDD < ~8V)
+    pub gvdd_uv: bool,
+    /// GVDD overvoltage fault (GVDD > ~16V)
+    pub gvdd_ov: bool,
+    /// PVDD undervoltage fault (PVDD < ~5.9V)
+    pub pvdd_uv: bool,
+    /// Overtemperature shutdown (die temp > ~150°C)
+    pub otsd: bool,
+    /// Overtemperature warning (die temp > ~130°C)
+    pub otw: bool,
+    /// Phase A high-side FET overcurrent
+    pub fetha_oc: bool,
+    /// Phase A low-side FET overcurrent
+    pub fetla_oc: bool,
+    /// Phase B high-side FET overcurrent
+    pub fethb_oc: bool,
+    /// Phase B low-side FET overcurrent
+    pub fetlb_oc: bool,
+    /// Phase C high-side FET overcurrent
+    pub fethc_oc: bool,
+    /// Phase C low-side FET overcurrent
+    pub fetlc_oc: bool,
+}
+
+impl FaultStatus {
+    /// Returns true if any overcurrent fault is active on any phase
+    pub fn has_overcurrent(&self) -> bool {
+        self.fetha_oc
+            || self.fetla_oc
+            || self.fethb_oc
+            || self.fetlb_oc
+            || self.fethc_oc
+            || self.fetlc_oc
+    }
+
+    /// Returns true if any thermal condition (warning or shutdown) is active
+    pub fn has_thermal(&self) -> bool {
+        self.otsd || self.otw
+    }
+
+    /// Returns true if any voltage fault (UV or OV) is active
+    pub fn has_voltage_fault(&self) -> bool {
+        self.gvdd_uv || self.gvdd_ov || self.pvdd_uv
+    }
+
+    /// Returns true if no faults are active
+    pub fn is_ok(&self) -> bool {
+        !self.fault
+    }
+
+    /// Returns true if any phase A FET has an overcurrent fault
+    pub fn phase_a_overcurrent(&self) -> bool {
+        self.fetha_oc || self.fetla_oc
+    }
+
+    /// Returns true if any phase B FET has an overcurrent fault
+    pub fn phase_b_overcurrent(&self) -> bool {
+        self.fethb_oc || self.fetlb_oc
+    }
+
+    /// Returns true if any phase C FET has an overcurrent fault
+    pub fn phase_c_overcurrent(&self) -> bool {
+        self.fethc_oc || self.fetlc_oc
+    }
+}
+
 pub struct DrvInterface<SpiBus> {
     spi_bus: SpiBus,
 }

@@ -1,6 +1,6 @@
 [package]
 name = "drv8301-dd"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "A driver for the DRV8301 gate driver IC (uses device-driver crate)"
 authors = ["Danila Gornushko <me@okhsunrog.dev>"]
