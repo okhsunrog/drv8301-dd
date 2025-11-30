@@ -237,6 +237,11 @@ The DRV8301 requires SPI communication with specific characteristics:
 - **Voltage Levels:** 3.3V or 5V logic compatible
 - **Connections:** SCLK, MISO, MOSI, CS (chip select)
 
+## Datasheet
+
+- [DRV8301 Datasheet - PDF](docs/drv8301.pdf)
+- [DRV8301 Datasheet - Markdown](docs/drv8301.md) (OCR-converted for easier reference)
+
 ## Feature Flags
 
 - **`default = []`**: No default features; async and blocking drivers are always available.
