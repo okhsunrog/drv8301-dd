@@ -9,7 +9,7 @@
 //!
 //! ## Features
 //!
-//! *   **Declarative Register Map:** Full device configuration defined in `device.yaml`.
+//! *   **Declarative Register Map:** Full device configuration defined in `device.ddsl`.
 //! *   **Unified Async/Blocking Support:** Write your code once and use it in both async and blocking contexts via bisync.
 //! *   **Type-Safe API:** High-level functions for common operations (e.g., setting overcurrent thresholds)
 //!     and a generated low-level API (`ll`) for direct register access.
@@ -44,7 +44,7 @@
 //! # Ok::<(), drv8301_dd::DrvError<()>>(())
 //! ```
 //!
-//! For a detailed register map, please refer to the `device.yaml` file in the
+//! For a detailed register map, please refer to the `device.ddsl` file in the
 //! [repository](https://github.com/okhsunrog/drv8301-dd).
 //!
 //! ## Warning!
@@ -58,7 +58,7 @@ pub(crate) mod fmt;
 
 use thiserror::Error;
 
-device_driver::create_device!(device_name: DrvLowLevel, manifest: "device.yaml");
+device_driver::compile!(manifest: "device.ddsl");
 
 #[derive(Debug, Error)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -154,6 +154,20 @@ impl<SpiBus> DrvInterface<SpiBus> {
     pub fn new(spi_bus: SpiBus) -> Self {
         Self { spi_bus }
     }
+}
+
+// `RegisterInterfaceBase` (error + address type) is shared by the blocking and
+// async interface traits, so it must be implemented exactly once — outside the
+// bisync-duplicated `driver.rs`. `embedded_hal::spi::ErrorType` is the common
+// supertrait of both the blocking and async `SpiDevice`, so this single impl
+// covers both worlds without committing to either.
+impl<SpiBus, E> device_driver::RegisterInterfaceBase for DrvInterface<SpiBus>
+where
+    SpiBus: embedded_hal::spi::ErrorType<Error = E>,
+    E: core::fmt::Debug,
+{
+    type Error = DrvError<E>;
+    type AddressType = u8;
 }
 
 #[path = "."]

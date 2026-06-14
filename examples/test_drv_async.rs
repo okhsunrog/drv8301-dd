@@ -158,8 +158,8 @@ where
     drv.ll
         .control_register_2()
         .modify_async(|w| {
-            w.set_dc_cal_ch1(true);
-            w.set_dc_cal_ch2(true);
+            w.set_dc_cal_ch_1(true);
+            w.set_dc_cal_ch_2(true);
         })
         .await?;
     info!("DC calibration enabled via LL API");

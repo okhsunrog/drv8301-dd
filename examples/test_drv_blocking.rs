@@ -143,8 +143,8 @@ where
 
     // Modify control register 2 to enable DC calibration using low-level API
     drv.ll.control_register_2().modify(|w| {
-        w.set_dc_cal_ch1(true);
-        w.set_dc_cal_ch2(true);
+        w.set_dc_cal_ch_1(true);
+        w.set_dc_cal_ch_2(true);
     })?;
     info!("DC calibration enabled via LL API");
 

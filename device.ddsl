@@ -1,0 +1,231 @@
+/// DRV8301 Three-Phase Gate Driver
+///
+/// SPI: CPOL=0, CPHA=1, 16-bit frames, MSB first (up to 10 MHz).
+/// Each frame carries 1 R/W bit, 4 address bits and 11 data bits.
+/// Only bits [10:0] hold register data; bits [15:11] are SPI framing
+/// and are handled by the interface implementation.
+device Drv8301Ll {
+    // Big endian on the wire (MSB first), 4-bit address embedded in the frame.
+    byte-order: BE,
+    register-address-type: u8,
+    // Match the v1 (YAML) name conversion so generated names stay identical:
+    // Underscore, Hyphen, LowerUpper, UpperDigit, DigitUpper.
+    word-boundaries: "_:-:aA:a1:A1:1A",
+
+    /// Status Register 1
+    ///
+    /// Fault and warning indicators. All overcurrent status bits are latched
+    /// until read via SPI.
+    register StatusRegister1 {
+        address: 0x00,
+        access: RO,
+        fields: fieldset StatusRegister1FieldSet {
+            size-bytes: 2,
+
+            /// Latched fault indicator: logical OR of GVDD_UV, GVDD_OV, PVDD_UV,
+            /// OTSD and all FET overcurrent faults.
+            field fault 10 -> bool,
+            /// GVDD undervoltage fault (GVDD < ~8V).
+            field gvdd_uv 9 -> bool,
+            /// PVDD undervoltage fault (PVDD < ~5.9V).
+            field pvdd_uv 8 -> bool,
+            /// Overtemperature shutdown (die temp > ~150°C).
+            field otsd 7 -> bool,
+            /// Overtemperature warning (die temp > ~130°C).
+            field otw 6 -> bool,
+            /// Half-bridge A, high-side FET overcurrent (latched until read).
+            field fetha_oc 5 -> bool,
+            /// Half-bridge A, low-side FET overcurrent (latched until read).
+            field fetla_oc 4 -> bool,
+            /// Half-bridge B, high-side FET overcurrent (latched until read).
+            field fethb_oc 3 -> bool,
+            /// Half-bridge B, low-side FET overcurrent (latched until read).
+            field fetlb_oc 2 -> bool,
+            /// Half-bridge C, high-side FET overcurrent (latched until read).
+            field fethc_oc 1 -> bool,
+            /// Half-bridge C, low-side FET overcurrent (latched until read).
+            field fetlc_oc 0 -> bool,
+        }
+    },
+
+    /// Status Register 2
+    ///
+    /// GVDD overvoltage fault indicator and device identification code.
+    register StatusRegister2 {
+        address: 0x01,
+        access: RO,
+        fields: fieldset StatusRegister2FieldSet {
+            size-bytes: 2,
+
+            /// GVDD overvoltage fault (GVDD > ~16V).
+            /// Can only be cleared by a full EN_GATE reset (>20µs low).
+            field gvdd_ov 7 -> bool,
+            /// Device identification code.
+            field device_id 3:0 -> uint,
+        }
+    },
+
+    /// Control Register 1
+    ///
+    /// Gate drive current, fault reset, PWM mode and overcurrent protection.
+    register ControlRegister1 {
+        address: 0x02,
+        reset: 0x0000,
+        fields: fieldset ControlRegister1FieldSet {
+            size-bytes: 2,
+
+            /// Overcurrent (VDS) threshold adjustment.
+            /// Values 28-31 are not available at PVDD = 6-8V.
+            field oc_adj_set 10:6 -> uint as OcAdjSet,
+            /// Overcurrent protection mode.
+            field ocp_mode 5:4 -> uint as OcpMode,
+            /// PWM input mode: `false` = 6-PWM, `true` = 3-PWM.
+            field pwm_mode 3 -> bool,
+            /// Gate driver fault reset. Writing `true` resets latched gate
+            /// driver faults; auto-clears. Cannot clear GVDD_OV.
+            field gate_reset 2 -> bool,
+            /// Peak gate drive current.
+            field gate_current 1:0 -> uint as GateCurrent,
+        }
+    },
+
+    /// Control Register 2
+    ///
+    /// Current shunt amplifier gain, DC calibration and OC off-time control.
+    register ControlRegister2 {
+        address: 0x03,
+        reset: 0x0000,
+        fields: fieldset ControlRegister2FieldSet {
+            size-bytes: 2,
+            // Bits 10:7 are reserved and must be written as 0 (left unmodeled).
+
+            /// OC off-time control: `false` = cycle-by-cycle, `true` = off-time
+            /// control (64µs disable period after an OC event).
+            field oc_toff 6 -> bool,
+            /// DC calibration mode for shunt amplifier channel 2.
+            field dc_cal_ch2 5 -> bool,
+            /// DC calibration mode for shunt amplifier channel 1.
+            field dc_cal_ch1 4 -> bool,
+            /// Current shunt amplifier gain (applies to both channels).
+            field gain 3:2 -> uint as ShuntAmplifierGain,
+            /// nOCTW pin reporting mode.
+            field octw_mode 1:0 -> uint as OctwMode,
+        }
+    },
+
+    /// VDS overcurrent threshold settings (typical values).
+    enum OcAdjSet {
+        /// VDS threshold = 0.060V
+        Vds060mV: 0,
+        /// VDS threshold = 0.068V
+        Vds068mV: 1,
+        /// VDS threshold = 0.076V
+        Vds076mV: 2,
+        /// VDS threshold = 0.086V
+        Vds086mV: 3,
+        /// VDS threshold = 0.097V
+        Vds097mV: 4,
+        /// VDS threshold = 0.109V
+        Vds109mV: 5,
+        /// VDS threshold = 0.123V
+        Vds123mV: 6,
+        /// VDS threshold = 0.138V
+        Vds138mV: 7,
+        /// VDS threshold = 0.155V
+        Vds155mV: 8,
+        /// VDS threshold = 0.175V
+        Vds175mV: 9,
+        /// VDS threshold = 0.197V
+        Vds197mV: 10,
+        /// VDS threshold = 0.222V
+        Vds222mV: 11,
+        /// VDS threshold = 0.250V
+        Vds250mV: 12,
+        /// VDS threshold = 0.282V
+        Vds282mV: 13,
+        /// VDS threshold = 0.317V
+        Vds317mV: 14,
+        /// VDS threshold = 0.358V
+        Vds358mV: 15,
+        /// VDS threshold = 0.403V
+        Vds403mV: 16,
+        /// VDS threshold = 0.454V
+        Vds454mV: 17,
+        /// VDS threshold = 0.511V
+        Vds511mV: 18,
+        /// VDS threshold = 0.576V
+        Vds576mV: 19,
+        /// VDS threshold = 0.648V
+        Vds648mV: 20,
+        /// VDS threshold = 0.730V
+        Vds730mV: 21,
+        /// VDS threshold = 0.822V
+        Vds822mV: 22,
+        /// VDS threshold = 0.926V
+        Vds926mV: 23,
+        /// VDS threshold = 1.043V
+        Vds1043mV: 24,
+        /// VDS threshold = 1.175V
+        Vds1175mV: 25,
+        /// VDS threshold = 1.324V
+        Vds1324mV: 26,
+        /// VDS threshold = 1.491V
+        Vds1491mV: 27,
+        /// VDS threshold = 1.679V (not available at PVDD 6-8V)
+        Vds1679mV: 28,
+        /// VDS threshold = 1.892V (not available at PVDD 6-8V)
+        Vds1892mV: 29,
+        /// VDS threshold = 2.131V (not available at PVDD 6-8V)
+        Vds2131mV: 30,
+        /// VDS threshold = 2.400V (not available at PVDD 6-8V)
+        Vds2400mV: 31,
+    },
+
+    /// Overcurrent protection operating mode.
+    enum OcpMode {
+        /// Current limit mode; half-bridge keeps operating with current limiting.
+        CurrentLimit: 0,
+        /// OC latch shutdown; disables half-bridge and latches fault.
+        OcLatchShutdown: 1,
+        /// Report only; no protective action, reported on nOCTW.
+        ReportOnly: 2,
+        /// Overcurrent detection disabled.
+        OcDisabled: 3,
+    },
+
+    /// Peak gate drive current.
+    enum GateCurrent {
+        /// Peak source 1.7A, peak sink 2.3A.
+        High: 0,
+        /// Peak source 0.7A, peak sink 1.0A.
+        Medium: 1,
+        /// Peak source 0.25A, peak sink 0.5A.
+        Low: 2,
+        /// Reserved - do not use.
+        Reserved: 3,
+    },
+
+    /// Current shunt amplifier gain.
+    enum ShuntAmplifierGain {
+        /// 10 V/V, ~3.3MHz bandwidth.
+        Gain10: 0,
+        /// 20 V/V, ~1.65MHz bandwidth.
+        Gain20: 1,
+        /// 40 V/V, ~825kHz bandwidth.
+        Gain40: 2,
+        /// 80 V/V, ~412kHz bandwidth.
+        Gain80: 3,
+    },
+
+    /// nOCTW pin reporting mode.
+    enum OctwMode {
+        /// Report both overtemperature and overcurrent.
+        OtAndOc: 0,
+        /// Report overtemperature only.
+        OtOnly: 1,
+        /// Report overcurrent only.
+        OcOnly: 2,
+        /// Report overcurrent only (reserved value, same as OcOnly).
+        OcOnlyReserved: 3,
+    },
+}

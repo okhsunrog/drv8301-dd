@@ -1,6 +1,10 @@
 use super::{RegisterInterface, SpiDevice, bisync, only_async, only_sync};
-use crate::{DrvError, DrvInterface, DrvLowLevel, FaultStatus};
+use crate::{Drv8301Ll, DrvError, DrvInterface, FaultStatus};
 use crate::{GateCurrent, OcAdjSet, OcpMode, OctwMode, ShuntAmplifierGain};
+use device_driver::{
+    Block, Fieldset, FieldsetMetadata, ReadCapability, RegisterInterfaceBase, RegisterOperation,
+    WriteCapability,
+};
 
 #[bisync]
 impl<SpiBus, E> RegisterInterface for DrvInterface<SpiBus>
@@ -8,15 +12,12 @@ where
     SpiBus: SpiDevice<Error = E>,
     E: core::fmt::Debug,
 {
-    type AddressType = u8;
-    type Error = DrvError<E>;
-
     async fn read_register(
         &mut self,
         address: u8,
-        _size_bits: u32,
         data: &mut [u8],
-    ) -> Result<(), Self::Error> {
+        _metadata: &FieldsetMetadata,
+    ) -> Result<(), DrvError<E>> {
         // Build read command: bit 15 = 1 (read), bits 14:11 = address, bits 10:0 = don't care
         let cmd: u16 = 0x8000 | ((address as u16 & 0x0F) << 11);
         let cmd_bytes = cmd.to_be_bytes();
@@ -55,9 +56,9 @@ where
     async fn write_register(
         &mut self,
         address: u8,
-        _size_bits: u32,
-        data: &[u8],
-    ) -> Result<(), Self::Error> {
+        data: &mut [u8],
+        _metadata: &FieldsetMetadata,
+    ) -> Result<(), DrvError<E>> {
         // Extract 11-bit data from buffer (big-endian)
         let reg_data = if data.len() >= 2 {
             ((data[0] as u16) << 8) | (data[1] as u16)
@@ -83,10 +84,10 @@ where
 }
 
 pub struct Drv8301<
-    SpiImpl: RegisterInterface<AddressType = u8, Error = DrvError<SpiBusErr>>,
-    SpiBusErr: core::fmt::Debug = <SpiImpl as RegisterInterface>::Error,
+    SpiImpl: RegisterInterfaceBase<AddressType = u8, Error = DrvError<SpiBusErr>>,
+    SpiBusErr: core::fmt::Debug = <SpiImpl as RegisterInterfaceBase>::Error,
 > {
-    pub ll: DrvLowLevel<SpiImpl>,
+    pub ll: Drv8301Ll<SpiImpl>,
     _marker: core::marker::PhantomData<SpiBusErr>,
 }
 
@@ -97,20 +98,23 @@ where
 {
     pub fn new(spi: SpiBus) -> Self {
         Self {
-            ll: DrvLowLevel::new(DrvInterface::new(spi)),
+            ll: Drv8301Ll::new(DrvInterface::new(spi)),
             _marker: core::marker::PhantomData,
         }
     }
 }
 
+/// Helper bound bundling the device-driver interface traits the high-level API
+/// relies on: the operation trait (`RegisterInterface`, aliased per bisync flavor)
+/// plus the shared base carrying the address/error types.
 pub trait CurrentDrvDriverInterface<E>:
-    RegisterInterface<AddressType = u8, Error = DrvError<E>>
+    RegisterInterface + RegisterInterfaceBase<AddressType = u8, Error = DrvError<E>>
 {
 }
 
 impl<T, E> CurrentDrvDriverInterface<E> for T
 where
-    T: RegisterInterface<AddressType = u8, Error = DrvError<E>>,
+    T: RegisterInterface + RegisterInterfaceBase<AddressType = u8, Error = DrvError<E>>,
     E: core::fmt::Debug,
 {
 }
@@ -243,14 +247,14 @@ where
     #[bisync]
     pub async fn set_dc_cal_ch1(&mut self, enable: bool) -> Result<(), DrvError<SpiBusErr>> {
         let mut op = self.ll.control_register_2();
-        modify_internal(&mut op, |r| r.set_dc_cal_ch1(enable)).await
+        modify_internal(&mut op, |r| r.set_dc_cal_ch_1(enable)).await
     }
 
     /// Enable or disable DC calibration mode for shunt amplifier channel 2
     #[bisync]
     pub async fn set_dc_cal_ch2(&mut self, enable: bool) -> Result<(), DrvError<SpiBusErr>> {
         let mut op = self.ll.control_register_2();
-        modify_internal(&mut op, |r| r.set_dc_cal_ch2(enable)).await
+        modify_internal(&mut op, |r| r.set_dc_cal_ch_2(enable)).await
     }
 
     /// Set overcurrent off-time control mode
