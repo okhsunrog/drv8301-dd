@@ -438,6 +438,7 @@ dependencies = [
 [[package]]
 name = "device-driver"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "defmt 1.1.0",
  "device-driver-macros",
@@ -448,6 +449,7 @@ dependencies = [
 [[package]]
 name = "device-driver-codegen"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "askama",
  "clap",
@@ -460,6 +462,7 @@ dependencies = [
 [[package]]
 name = "device-driver-common"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "chumsky",
  "convert_case",
@@ -469,6 +472,7 @@ dependencies = [
 [[package]]
 name = "device-driver-core"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "clap",
  "device-driver-codegen",
@@ -486,6 +490,7 @@ dependencies = [
 [[package]]
 name = "device-driver-diagnostics"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "annotate-snippets",
  "convert_case",
@@ -496,6 +501,7 @@ dependencies = [
 [[package]]
 name = "device-driver-lexer"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "device-driver-common",
  "logos",
@@ -504,6 +510,7 @@ dependencies = [
 [[package]]
 name = "device-driver-lir"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "convert_case",
  "device-driver-common",
@@ -514,6 +521,7 @@ dependencies = [
 [[package]]
 name = "device-driver-macros"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "clap",
  "device-driver-core",
@@ -525,6 +533,7 @@ dependencies = [
 [[package]]
 name = "device-driver-mir"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "clap",
  "convert_case",
@@ -538,6 +547,7 @@ dependencies = [
 [[package]]
 name = "device-driver-parser"
 version = "2.0.0-alpha.1"
+source = "git+https://github.com/diondokter/device-driver?rev=a7bc491e8257453f4d12c315141359d43f1d01d0#a7bc491e8257453f4d12c315141359d43f1d01d0"
 dependencies = [
  "chumsky",
  "device-driver-common",
