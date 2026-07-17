@@ -62,7 +62,7 @@ The `drv8301-dd` driver offers:
      let mut drv = Drv8301::new(spi_device);
 
      // Configure overcurrent protection
-     drv.set_oc_threshold(OcAdjSet::Vds250mV)?;
+     drv.set_oc_threshold(OcAdjSet::Vds250Mv)?;
      drv.set_ocp_mode(OcpMode::CurrentLimit)?;
 
      // Set PWM mode and amplifier gain
@@ -92,7 +92,7 @@ The `drv8301-dd` driver offers:
      let mut drv = Drv8301Async::new(spi_device);
 
      // Configure overcurrent protection
-     drv.set_oc_threshold(OcAdjSet::Vds250mV).await?;
+     drv.set_oc_threshold(OcAdjSet::Vds250Mv).await?;
      drv.set_ocp_mode(OcpMode::CurrentLimit).await?;
 
      // Set PWM mode and amplifier gain
@@ -148,7 +148,7 @@ drv.ll.control_register_1().write(|w| {
     w.set_gate_current(GateCurrent::Ma1700);
     w.set_gate_reset(false);
     w.set_pwm_mode(PwmMode::SixPwm);
-    w.set_oc_adj_set(OcAdjSet::Vds250mV);
+    w.set_oc_adj_set(OcAdjSet::Vds250Mv);
 })?;
 
 // Configure control register 2

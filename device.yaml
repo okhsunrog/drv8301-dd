@@ -199,38 +199,38 @@ ControlRegister1:
       conversion:
         name: OcAdjSet
         description: VDS overcurrent threshold settings (typical values)
-        Vds060mV: { value: 0, description: "VDS threshold = 0.060V" }
-        Vds068mV: { value: 1, description: "VDS threshold = 0.068V" }
-        Vds076mV: { value: 2, description: "VDS threshold = 0.076V" }
-        Vds086mV: { value: 3, description: "VDS threshold = 0.086V" }
-        Vds097mV: { value: 4, description: "VDS threshold = 0.097V" }
-        Vds109mV: { value: 5, description: "VDS threshold = 0.109V" }
-        Vds123mV: { value: 6, description: "VDS threshold = 0.123V" }
-        Vds138mV: { value: 7, description: "VDS threshold = 0.138V" }
-        Vds155mV: { value: 8, description: "VDS threshold = 0.155V" }
-        Vds175mV: { value: 9, description: "VDS threshold = 0.175V" }
-        Vds197mV: { value: 10, description: "VDS threshold = 0.197V" }
-        Vds222mV: { value: 11, description: "VDS threshold = 0.222V" }
-        Vds250mV: { value: 12, description: "VDS threshold = 0.250V" }
-        Vds282mV: { value: 13, description: "VDS threshold = 0.282V" }
-        Vds317mV: { value: 14, description: "VDS threshold = 0.317V" }
-        Vds358mV: { value: 15, description: "VDS threshold = 0.358V" }
-        Vds403mV: { value: 16, description: "VDS threshold = 0.403V" }
-        Vds454mV: { value: 17, description: "VDS threshold = 0.454V" }
-        Vds511mV: { value: 18, description: "VDS threshold = 0.511V" }
-        Vds576mV: { value: 19, description: "VDS threshold = 0.576V" }
-        Vds648mV: { value: 20, description: "VDS threshold = 0.648V" }
-        Vds730mV: { value: 21, description: "VDS threshold = 0.730V" }
-        Vds822mV: { value: 22, description: "VDS threshold = 0.822V" }
-        Vds926mV: { value: 23, description: "VDS threshold = 0.926V" }
-        Vds1043mV: { value: 24, description: "VDS threshold = 1.043V" }
-        Vds1175mV: { value: 25, description: "VDS threshold = 1.175V" }
-        Vds1324mV: { value: 26, description: "VDS threshold = 1.324V" }
-        Vds1491mV: { value: 27, description: "VDS threshold = 1.491V" }
-        Vds1679mV: { value: 28, description: "VDS threshold = 1.679V (not available at PVDD 6-8V)" }
-        Vds1892mV: { value: 29, description: "VDS threshold = 1.892V (not available at PVDD 6-8V)" }
-        Vds2131mV: { value: 30, description: "VDS threshold = 2.131V (not available at PVDD 6-8V)" }
-        Vds2400mV: { value: 31, description: "VDS threshold = 2.400V (not available at PVDD 6-8V)" }
+        Vds060Mv: { value: 0, description: "VDS threshold = 0.060V" }
+        Vds068Mv: { value: 1, description: "VDS threshold = 0.068V" }
+        Vds076Mv: { value: 2, description: "VDS threshold = 0.076V" }
+        Vds086Mv: { value: 3, description: "VDS threshold = 0.086V" }
+        Vds097Mv: { value: 4, description: "VDS threshold = 0.097V" }
+        Vds109Mv: { value: 5, description: "VDS threshold = 0.109V" }
+        Vds123Mv: { value: 6, description: "VDS threshold = 0.123V" }
+        Vds138Mv: { value: 7, description: "VDS threshold = 0.138V" }
+        Vds155Mv: { value: 8, description: "VDS threshold = 0.155V" }
+        Vds175Mv: { value: 9, description: "VDS threshold = 0.175V" }
+        Vds197Mv: { value: 10, description: "VDS threshold = 0.197V" }
+        Vds222Mv: { value: 11, description: "VDS threshold = 0.222V" }
+        Vds250Mv: { value: 12, description: "VDS threshold = 0.250V" }
+        Vds282Mv: { value: 13, description: "VDS threshold = 0.282V" }
+        Vds317Mv: { value: 14, description: "VDS threshold = 0.317V" }
+        Vds358Mv: { value: 15, description: "VDS threshold = 0.358V" }
+        Vds403Mv: { value: 16, description: "VDS threshold = 0.403V" }
+        Vds454Mv: { value: 17, description: "VDS threshold = 0.454V" }
+        Vds511Mv: { value: 18, description: "VDS threshold = 0.511V" }
+        Vds576Mv: { value: 19, description: "VDS threshold = 0.576V" }
+        Vds648Mv: { value: 20, description: "VDS threshold = 0.648V" }
+        Vds730Mv: { value: 21, description: "VDS threshold = 0.730V" }
+        Vds822Mv: { value: 22, description: "VDS threshold = 0.822V" }
+        Vds926Mv: { value: 23, description: "VDS threshold = 0.926V" }
+        Vds1043Mv: { value: 24, description: "VDS threshold = 1.043V" }
+        Vds1175Mv: { value: 25, description: "VDS threshold = 1.175V" }
+        Vds1324Mv: { value: 26, description: "VDS threshold = 1.324V" }
+        Vds1491Mv: { value: 27, description: "VDS threshold = 1.491V" }
+        Vds1679Mv: { value: 28, description: "VDS threshold = 1.679V (not available at PVDD 6-8V)" }
+        Vds1892Mv: { value: 29, description: "VDS threshold = 1.892V (not available at PVDD 6-8V)" }
+        Vds2131Mv: { value: 30, description: "VDS threshold = 2.131V (not available at PVDD 6-8V)" }
+        Vds2400Mv: { value: 31, description: "VDS threshold = 2.400V (not available at PVDD 6-8V)" }
 
     ocp_mode:
       base: uint

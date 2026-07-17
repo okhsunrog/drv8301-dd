@@ -116,69 +116,69 @@ device Drv8301Ll {
     /// VDS overcurrent threshold settings (typical values).
     enum OcAdjSet {
         /// VDS threshold = 0.060V
-        Vds060mV: 0,
+        Vds060Mv: 0,
         /// VDS threshold = 0.068V
-        Vds068mV: 1,
+        Vds068Mv: 1,
         /// VDS threshold = 0.076V
-        Vds076mV: 2,
+        Vds076Mv: 2,
         /// VDS threshold = 0.086V
-        Vds086mV: 3,
+        Vds086Mv: 3,
         /// VDS threshold = 0.097V
-        Vds097mV: 4,
+        Vds097Mv: 4,
         /// VDS threshold = 0.109V
-        Vds109mV: 5,
+        Vds109Mv: 5,
         /// VDS threshold = 0.123V
-        Vds123mV: 6,
+        Vds123Mv: 6,
         /// VDS threshold = 0.138V
-        Vds138mV: 7,
+        Vds138Mv: 7,
         /// VDS threshold = 0.155V
-        Vds155mV: 8,
+        Vds155Mv: 8,
         /// VDS threshold = 0.175V
-        Vds175mV: 9,
+        Vds175Mv: 9,
         /// VDS threshold = 0.197V
-        Vds197mV: 10,
+        Vds197Mv: 10,
         /// VDS threshold = 0.222V
-        Vds222mV: 11,
+        Vds222Mv: 11,
         /// VDS threshold = 0.250V
-        Vds250mV: 12,
+        Vds250Mv: 12,
         /// VDS threshold = 0.282V
-        Vds282mV: 13,
+        Vds282Mv: 13,
         /// VDS threshold = 0.317V
-        Vds317mV: 14,
+        Vds317Mv: 14,
         /// VDS threshold = 0.358V
-        Vds358mV: 15,
+        Vds358Mv: 15,
         /// VDS threshold = 0.403V
-        Vds403mV: 16,
+        Vds403Mv: 16,
         /// VDS threshold = 0.454V
-        Vds454mV: 17,
+        Vds454Mv: 17,
         /// VDS threshold = 0.511V
-        Vds511mV: 18,
+        Vds511Mv: 18,
         /// VDS threshold = 0.576V
-        Vds576mV: 19,
+        Vds576Mv: 19,
         /// VDS threshold = 0.648V
-        Vds648mV: 20,
+        Vds648Mv: 20,
         /// VDS threshold = 0.730V
-        Vds730mV: 21,
+        Vds730Mv: 21,
         /// VDS threshold = 0.822V
-        Vds822mV: 22,
+        Vds822Mv: 22,
         /// VDS threshold = 0.926V
-        Vds926mV: 23,
+        Vds926Mv: 23,
         /// VDS threshold = 1.043V
-        Vds1043mV: 24,
+        Vds1043Mv: 24,
         /// VDS threshold = 1.175V
-        Vds1175mV: 25,
+        Vds1175Mv: 25,
         /// VDS threshold = 1.324V
-        Vds1324mV: 26,
+        Vds1324Mv: 26,
         /// VDS threshold = 1.491V
-        Vds1491mV: 27,
+        Vds1491Mv: 27,
         /// VDS threshold = 1.679V (not available at PVDD 6-8V)
-        Vds1679mV: 28,
+        Vds1679Mv: 28,
         /// VDS threshold = 1.892V (not available at PVDD 6-8V)
-        Vds1892mV: 29,
+        Vds1892Mv: 29,
         /// VDS threshold = 2.131V (not available at PVDD 6-8V)
-        Vds2131mV: 30,
+        Vds2131Mv: 30,
         /// VDS threshold = 2.400V (not available at PVDD 6-8V)
-        Vds2400mV: 31,
+        Vds2400Mv: 31,
     },
 
     /// Overcurrent protection operating mode.

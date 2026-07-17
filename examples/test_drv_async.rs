@@ -115,7 +115,7 @@ where
     }
 
     // Configure overcurrent threshold (high-level API)
-    drv.set_oc_threshold(OcAdjSet::Vds250mV).await?;
+    drv.set_oc_threshold(OcAdjSet::Vds250Mv).await?;
 
     // Set overcurrent protection mode (high-level API)
     drv.set_ocp_mode(OcpMode::CurrentLimit).await?;
