@@ -14,9 +14,7 @@ documentation = "https://docs.rs/drv8301-dd"
 bisync = "0.3"
 defmt = { version = "1.0", optional = true }
 log = { version = "0.4", optional = true }
-# NOTE: experimental migration to device-driver 2.0 (custom .ddsl DSL).
-# Pinned to the latest tested master commit of the 2.0.0-alpha.1 line; not yet on crates.io.
-device-driver = { git = "https://github.com/diondokter/device-driver", rev = "e1762a8f7fd6c0cf7484b0962eb52cf2d77fdc2d", default-features = false, features = ["macros"] }
+device-driver = { version = "2.1.1", default-features = false, features = ["macros"] }
 embedded-hal = "1.0.0"
 embedded-hal-async = "1.0.0"
 thiserror = { version = "2.0.12", default-features = false }

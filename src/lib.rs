@@ -3,7 +3,7 @@
 //!
 //! This crate provides a bisync-based driver for the DRV8301 three-phase gate driver IC,
 //! built upon the `device-driver` crate for robust, declarative register
-//! definitions via a YAML manifest. It supports both asynchronous (`async`)
+//! definitions via a DDSL manifest. It supports both asynchronous (`async`)
 //! and blocking operation through a unified API, using the [`bisync`](https://docs.rs/bisync) crate
 //! for seamless compatibility with both `embedded-hal` and `embedded-hal-async` traits.
 //!
@@ -58,7 +58,10 @@ pub(crate) mod fmt;
 
 use thiserror::Error;
 
-device_driver::compile!(manifest: "device.ddsl");
+device_driver::compile!(
+    options: "--rust-defmt-feature=defmt",
+    manifest: "device.ddsl"
+);
 
 #[derive(Debug, Error)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]

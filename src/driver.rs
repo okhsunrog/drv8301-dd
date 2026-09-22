@@ -129,16 +129,16 @@ where
     /// Check if any fault condition is active
     #[bisync]
     pub async fn has_fault(&mut self) -> Result<bool, DrvError<SpiBusErr>> {
-        let mut op = self.ll.status_register_1();
-        let status = read_internal(&mut op).await?;
+        let op = self.ll.status_register_1();
+        let status = read_internal(op).await?;
         Ok(status.fault())
     }
 
     /// Get device ID from Status Register 2
     #[bisync]
     pub async fn get_device_id(&mut self) -> Result<u8, DrvError<SpiBusErr>> {
-        let mut op = self.ll.status_register_2();
-        let status = read_internal(&mut op).await?;
+        let op = self.ll.status_register_2();
+        let status = read_internal(op).await?;
         Ok(status.device_id())
     }
 
@@ -163,11 +163,11 @@ where
     /// ```
     #[bisync]
     pub async fn get_fault_status(&mut self) -> Result<FaultStatus, DrvError<SpiBusErr>> {
-        let mut op1 = self.ll.status_register_1();
-        let status1 = read_internal(&mut op1).await?;
+        let op1 = self.ll.status_register_1();
+        let status1 = read_internal(op1).await?;
 
-        let mut op2 = self.ll.status_register_2();
-        let status2 = read_internal(&mut op2).await?;
+        let op2 = self.ll.status_register_2();
+        let status2 = read_internal(op2).await?;
 
         Ok(FaultStatus {
             fault: status1.fault(),
@@ -191,29 +191,29 @@ where
         &mut self,
         threshold: OcAdjSet,
     ) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_1();
-        modify_internal(&mut op, |r| r.set_oc_adj_set(threshold)).await
+        let op = self.ll.control_register_1();
+        modify_internal(op, |r| r.set_oc_adj_set(threshold)).await
     }
 
     /// Set the overcurrent protection mode
     #[bisync]
     pub async fn set_ocp_mode(&mut self, mode: OcpMode) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_1();
-        modify_internal(&mut op, |r| r.set_ocp_mode(mode)).await
+        let op = self.ll.control_register_1();
+        modify_internal(op, |r| r.set_ocp_mode(mode)).await
     }
 
     /// Set PWM mode (6-PWM or 3-PWM)
     #[bisync]
     pub async fn set_pwm_mode(&mut self, three_pwm: bool) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_1();
-        modify_internal(&mut op, |r| r.set_pwm_mode(three_pwm)).await
+        let op = self.ll.control_register_1();
+        modify_internal(op, |r| r.set_pwm_mode(three_pwm)).await
     }
 
     /// Reset gate driver faults
     #[bisync]
     pub async fn reset_gate_faults(&mut self) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_1();
-        modify_internal(&mut op, |r| r.set_gate_reset(true)).await
+        let op = self.ll.control_register_1();
+        modify_internal(op, |r| r.set_gate_reset(true)).await
     }
 
     /// Set the peak gate drive current
@@ -222,8 +222,8 @@ where
         &mut self,
         current: GateCurrent,
     ) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_1();
-        modify_internal(&mut op, |r| r.set_gate_current(current)).await
+        let op = self.ll.control_register_1();
+        modify_internal(op, |r| r.set_gate_current(current)).await
     }
 
     /// Set the current shunt amplifier gain
@@ -232,35 +232,35 @@ where
         &mut self,
         gain: ShuntAmplifierGain,
     ) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_2();
-        modify_internal(&mut op, |r| r.set_gain(gain)).await
+        let op = self.ll.control_register_2();
+        modify_internal(op, |r| r.set_gain(gain)).await
     }
 
     /// Set the nOCTW pin reporting mode
     #[bisync]
     pub async fn set_octw_mode(&mut self, mode: OctwMode) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_2();
-        modify_internal(&mut op, |r| r.set_octw_mode(mode)).await
+        let op = self.ll.control_register_2();
+        modify_internal(op, |r| r.set_octw_mode(mode)).await
     }
 
     /// Enable or disable DC calibration mode for shunt amplifier channel 1
     #[bisync]
     pub async fn set_dc_cal_ch1(&mut self, enable: bool) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_2();
-        modify_internal(&mut op, |r| r.set_dc_cal_ch_1(enable)).await
+        let op = self.ll.control_register_2();
+        modify_internal(op, |r| r.set_dc_cal_ch_1(enable)).await
     }
 
     /// Enable or disable DC calibration mode for shunt amplifier channel 2
     #[bisync]
     pub async fn set_dc_cal_ch2(&mut self, enable: bool) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_2();
-        modify_internal(&mut op, |r| r.set_dc_cal_ch_2(enable)).await
+        let op = self.ll.control_register_2();
+        modify_internal(op, |r| r.set_dc_cal_ch_2(enable)).await
     }
 
     /// Set overcurrent off-time control mode
     #[bisync]
     pub async fn set_oc_toff(&mut self, off_time_control: bool) -> Result<(), DrvError<SpiBusErr>> {
-        let mut op = self.ll.control_register_2();
-        modify_internal(&mut op, |r| r.set_oc_toff(off_time_control)).await
+        let op = self.ll.control_register_2();
+        modify_internal(op, |r| r.set_oc_toff(off_time_control)).await
     }
 }

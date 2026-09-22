@@ -6,8 +6,10 @@
 /// and are handled by the interface implementation.
 device Drv8301Ll {
     // Big endian on the wire (MSB first), 4-bit address embedded in the frame.
-    byte-order: BE,
+    default-byte-order: BE,
     register-address-type: u8,
+    // Registers and fields are read-write unless stated otherwise.
+    default-access: RW,
     // Match the v1 (YAML) name conversion so generated names stay identical:
     // Underscore, Hyphen, LowerUpper, UpperDigit, DigitUpper.
     word-boundaries: "_:-:aA:a1:A1:1A",
