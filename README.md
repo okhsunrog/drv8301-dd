@@ -40,7 +40,7 @@ The `drv8301-dd` driver offers:
 
    ```toml
    [dependencies]
-   drv8301-dd = "0.2.0"
+   drv8301-dd = "0.3.0"
    # For blocking usage (Drv8301):
    embedded-hal = "1.0.0"
    # For async usage (Drv8301Async):
