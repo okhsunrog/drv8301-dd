@@ -11,7 +11,7 @@ This crate provides a no_std driver for the DRV8301 three-phase gate driver IC, 
 The `drv8301-dd` driver offers:
 
 - **Declarative Configuration:** The DRV8301 register map is defined in [`device.ddsl`](device.ddsl), enabling `device-driver` to generate a type-safe, low-level register access API. This approach enhances maintainability and extensibility.
-- **Unified Async/Blocking API:** Uses the [`bisync`](https://github.com/JM4ier/bisync) crate to provide both asynchronous (`Drv8301Async`) and blocking (`Drv8301`) drivers from the same codebase, with no feature flags required.
+- **Unified Async/Blocking API:** Uses the [`bisync2`](https://github.com/de-vri-es/bisync2-rs) crate to provide both asynchronous (`Drv8301Async`) and blocking (`Drv8301`) drivers from the same codebase, with no feature flags required.
 - **High-Level and Low-Level APIs:**
   - High-level methods simplify tasks like configuring overcurrent protection, PWM modes, and shunt amplifier gains.
   - Low-level API (via the `ll` field of the `Drv8301`/`Drv8301Async` struct) offers direct, type-safe access to all registers defined in `device.ddsl`.
