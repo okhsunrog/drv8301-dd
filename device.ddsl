@@ -23,6 +23,7 @@ device Drv8301Ll {
         access: RO,
         fields: fieldset StatusRegister1FieldSet {
             size-bytes: 2,
+            default-access: RO,
 
             /// Latched fault indicator: logical OR of GVDD_UV, GVDD_OV, PVDD_UV,
             /// OTSD and all FET overcurrent faults.
@@ -58,6 +59,7 @@ device Drv8301Ll {
         access: RO,
         fields: fieldset StatusRegister2FieldSet {
             size-bytes: 2,
+            default-access: RO,
 
             /// GVDD overvoltage fault (GVDD > ~16V).
             /// Can only be cleared by a full EN_GATE reset (>20µs low).
@@ -99,8 +101,9 @@ device Drv8301Ll {
         reset: 0x0000,
         fields: fieldset ControlRegister2FieldSet {
             size-bytes: 2,
-            // Bits 10:7 are reserved and must be written as 0 (left unmodeled).
 
+            /// Reserved bits. Must always be written as 0.
+            field reserved 10:7 RO -> uint,
             /// OC off-time control: `false` = cycle-by-cycle, `true` = off-time
             /// control (64µs disable period after an OC event).
             field oc_toff 6 -> bool,
